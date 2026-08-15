@@ -7,8 +7,8 @@ export function SiteNav() {
   return (
     <nav className="site-nav" aria-label="Primary navigation">
       <Link className="brand-mark" href="/">
-        <span className="brand-symbol">M</span>
-        <span>Meri GF</span>
+        <span className="heart-mark" />
+        <span>Merigf</span>
       </Link>
       <div className="nav-links">
         <Link href="/companions">Companions</Link>

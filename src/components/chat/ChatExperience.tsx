@@ -1,17 +1,15 @@
 "use client";
 
-import { ArrowLeft, SendHorizontal, Settings } from "lucide-react";
-import Link from "next/link";
+import { MoreHorizontal, Phone, Search, SendHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
-import { Button } from "@/components/design/Buttons";
 import { ChatBubble } from "@/components/chat/ChatBubble";
-import { CompanionAvatar } from "@/components/companions/CompanionAvatar";
-import { MoodIndicator } from "@/components/companions/MoodIndicator";
 import { TypingIndicator } from "@/components/chat/TypingIndicator";
+import { CompanionAvatar } from "@/components/companions/CompanionAvatar";
+import { AppSidebar } from "@/components/layout/AppSidebar";
 import { useChat } from "@/hooks/useChat";
-import { companions, getCompanionById, getCompanionThemeVars } from "@/lib/companions";
+import { getCompanionById, getCompanionThemeVars } from "@/lib/companions";
 
 const starterReplies = [
   "Tell me the part that stayed with you after everything else got quiet.",
@@ -26,9 +24,29 @@ export function ChatExperience() {
   const initialMessages = useMemo(
     () => [
       {
-        id: "greeting",
+        id: "m1",
         role: "assistant" as const,
         content: companion.greeting
+      },
+      {
+        id: "m2",
+        role: "user" as const,
+        content: "Hey. Really?"
+      },
+      {
+        id: "m3",
+        role: "assistant" as const,
+        content: "Yeah, especially how you see things differently. It is refreshing."
+      },
+      {
+        id: "m4",
+        role: "user" as const,
+        content: "That means a lot coming from you."
+      },
+      {
+        id: "m5",
+        role: "assistant" as const,
+        content: "Always. So, what is on your mind tonight?"
       }
     ],
     [companion.greeting]
@@ -50,50 +68,37 @@ export function ChatExperience() {
   }
 
   return (
-    <main className="chat-page" style={getCompanionThemeVars(companion)}>
-      <aside className="conversation-rail" aria-label="Companion switcher">
-        <Link className="rail-back" href="/companions">
-          <ArrowLeft size={18} />
-          <span>Companions</span>
-        </Link>
-        <div className="rail-list">
-          {companions.map((item) => (
-            <Link
-              href={`/chat?companion=${item.id}`}
-              key={item.id}
-              className={`rail-companion ${item.id === companion.id ? "active" : ""}`}
-              style={getCompanionThemeVars(item)}
-            >
-              <CompanionAvatar companion={item} size="small" />
-              <span>{item.name}</span>
-            </Link>
-          ))}
-        </div>
-      </aside>
+    <main className="app-shell chat-reference-shell" style={getCompanionThemeVars(companion)}>
+      <AppSidebar active="chats" />
 
-      <section className="chat-stage">
-        <header className="chat-header">
-          <div className="chat-identity">
+      <section className="reference-chat-stage">
+        <div className="chat-photo-backdrop">
+          <CompanionAvatar companion={companion} size="hero" />
+        </div>
+        <header className="reference-chat-header">
+          <div className="chat-person">
             <CompanionAvatar companion={companion} size="small" />
-            <div>
-              <h1>{companion.name}</h1>
-              <p>{companion.traits.join(" - ")}</p>
-            </div>
+            <span>
+              <b>{companion.name}</b>
+              <small>{companion.status}</small>
+            </span>
+            <i />
           </div>
-          <div className="chat-header-actions">
-            <MoodIndicator mood={companion.mood} />
-            <button className="icon-button" aria-label="Chat settings">
-              <Settings size={18} />
+          <div className="reference-chat-tools">
+            <button aria-label="Search conversation">
+              <Search size={18} />
+            </button>
+            <button aria-label="Voice call">
+              <Phone size={18} />
+            </button>
+            <button aria-label="More options">
+              <MoreHorizontal size={18} />
             </button>
           </div>
         </header>
 
-        <div className="chat-intro">
-          <CompanionAvatar companion={companion} size="medium" />
-          <p>{companion.greeting}</p>
-        </div>
-
-        <div className="message-list" aria-live="polite">
+        <div className="reference-message-list" aria-live="polite">
+          <span className="day-pill">Today</span>
           {messages.map((message) => (
             <ChatBubble key={message.id} message={message} />
           ))}
@@ -106,16 +111,16 @@ export function ChatExperience() {
           ) : null}
         </div>
 
-        <form className="chat-composer" onSubmit={handleSubmit}>
+        <form className="reference-composer" onSubmit={handleSubmit}>
           <input
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
-            placeholder={`Write to ${companion.name}...`}
-            aria-label={`Write to ${companion.name}`}
+            placeholder={`Message ${companion.name.split(" ")[0]}...`}
+            aria-label={`Message ${companion.name}`}
           />
-          <Button icon={<SendHorizontal size={18} />} type="submit">
-            Send
-          </Button>
+          <button type="submit" aria-label="Send message">
+            <SendHorizontal size={18} />
+          </button>
         </form>
       </section>
     </main>

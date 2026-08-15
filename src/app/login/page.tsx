@@ -1,35 +1,85 @@
-import { LogIn, ShieldCheck } from "lucide-react";
+import { Apple, EyeOff, Lock, Mail } from "lucide-react";
 
-import { AnimatedBackground } from "@/components/design/AnimatedBackground";
-import { Button } from "@/components/design/Buttons";
-import { GlassPanel } from "@/components/design/GlassPanel";
-import { SiteNav } from "@/components/layout/SiteNav";
+import { CompanionAvatar } from "@/components/companions/CompanionAvatar";
+import { companions } from "@/lib/companions";
 
 export default function LoginPage() {
+  const companion = companions[0];
+
   return (
-    <main className="site-page login-page">
-      <AnimatedBackground />
-      <SiteNav />
-      <section className="login-shell">
-        <div className="login-copy">
-          <p className="eyebrow">Welcome back</p>
-          <h1>Step into your private companion space.</h1>
-          <p>
-            Google sign-in will connect to the backend auth flow in the next phase. The interface is already shaped for
-            secure cookie sessions.
+    <main className="auth-page">
+      <section className="auth-visual">
+        <div className="auth-logo">
+          <span className="heart-mark" />
+          <span>Merigf</span>
+        </div>
+        <CompanionAvatar companion={companion} size="hero" />
+        <div className="auth-visual-copy">
+          <h1>
+            Your world.
+            <br />
+            Your <span>companion.</span>
+          </h1>
+          <p>Real conversations. Real emotions. AI companions who truly understand you.</p>
+        </div>
+      </section>
+
+      <section className="auth-panel-wrap">
+        <div className="auth-panel">
+          <p className="signup-line">
+            Don&apos;t have an account? <a href="/companions">Sign up</a>
+          </p>
+          <div className="auth-heading">
+            <h2>Welcome back</h2>
+            <p>Log in to continue your conversations</p>
+          </div>
+
+          <form className="auth-form">
+            <label>
+              Email address
+              <span className="input-shell">
+                <Mail size={20} />
+                <input type="email" placeholder="Enter your email" />
+              </span>
+            </label>
+            <label>
+              Password
+              <span className="input-shell">
+                <Lock size={20} />
+                <input type="password" placeholder="Enter your password" />
+                <EyeOff size={20} />
+              </span>
+            </label>
+            <a className="forgot-link" href="/login">
+              Forgot password?
+            </a>
+            <button className="auth-submit" type="button">
+              Log in
+            </button>
+          </form>
+
+          <div className="auth-divider">
+            <span />
+            <p>or continue with</p>
+            <span />
+          </div>
+
+          <div className="social-stack">
+            <button type="button">
+              <b>G</b>
+              Continue with Google
+            </button>
+            <button type="button">
+              <Apple size={22} />
+              Continue with Apple
+            </button>
+          </div>
+
+          <p className="terms-copy">
+            By continuing, you agree to our <a href="/login">Terms of Service</a> and{" "}
+            <a href="/login">Privacy Policy</a>.
           </p>
         </div>
-        <GlassPanel className="login-panel">
-          <h2>Sign in</h2>
-          <p>Continue with your account and keep conversations synced across sessions.</p>
-          <Button icon={<LogIn size={18} />} className="wide-button">
-            Continue with Google
-          </Button>
-          <div className="login-note">
-            <ShieldCheck size={16} />
-            <span>No AI keys or server secrets belong in the browser.</span>
-          </div>
-        </GlassPanel>
       </section>
     </main>
   );

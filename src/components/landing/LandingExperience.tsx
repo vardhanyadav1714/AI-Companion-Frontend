@@ -37,7 +37,7 @@ const features = [
 ];
 
 export function LandingExperience() {
-  const heroCompanion = companions[2];
+  const heroCompanion = companions[0];
 
   return (
     <>
@@ -51,7 +51,7 @@ export function LandingExperience() {
         >
           <p className="eyebrow">Premium AI companion platform</p>
           <h1>
-            Someone who <GradientText>remembers you.</GradientText>
+            Someone who <GradientText>understands you.</GradientText>
           </h1>
           <p>
             Meet companions with real emotional continuity, personal style, and conversations that do not reset every
