@@ -9,10 +9,11 @@ type CompanionAvatarProps = {
 };
 
 export function CompanionAvatar({ companion, size = "medium", className = "" }: CompanionAvatarProps) {
+  const imageUrl = companion.image.src ?? companionSheet;
   const style = {
-    backgroundImage: `url(${companionSheet})`,
-    backgroundPosition: companion.image.sheetPosition,
-    "--avatar-focal-point": companion.image.focalPoint
+    backgroundImage: `url(${imageUrl})`,
+    backgroundPosition: companion.image.src ? companion.image.focalPoint : companion.image.sheetPosition,
+    backgroundSize: companion.image.src ? "cover" : "300% 300%"
   } as CSSProperties;
 
   return (

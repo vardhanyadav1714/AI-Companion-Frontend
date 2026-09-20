@@ -8,7 +8,7 @@ export function SiteNav() {
     <nav className="site-nav" aria-label="Primary navigation">
       <Link className="brand-mark" href="/">
         <span className="heart-mark" />
-        <span>Merigf</span>
+        <span>Eva</span>
       </Link>
       <div className="nav-links">
         <Link href="/companions">Companions</Link>
@@ -16,7 +16,7 @@ export function SiteNav() {
         <Link href="/login">Login</Link>
       </div>
       <Button href="/companions" icon={<Sparkles size={17} />} className="nav-cta">
-        Meet them
+        Meet Eva
       </Button>
       <div className="mobile-nav">
         <Link href="/companions" aria-label="Companions">

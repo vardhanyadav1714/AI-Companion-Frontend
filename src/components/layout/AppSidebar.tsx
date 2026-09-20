@@ -37,7 +37,7 @@ export function AppSidebar({ active }: AppSidebarProps) {
     <aside className="app-sidebar">
       <Link className="app-brand" href="/">
         <span className="heart-mark" />
-        <span>Merigf</span>
+        <span>Eva</span>
       </Link>
 
       <nav className="app-nav" aria-label="Application navigation">
@@ -81,7 +81,7 @@ export function AppSidebar({ active }: AppSidebarProps) {
 
       <div className="premium-card">
         <div>
-          <strong>Merigf Premium</strong>
+        <strong>Eva Premium</strong>
           <Crown size={20} />
         </div>
         <p>Unlimited chats, advanced memory, voice calls and exclusive companions.</p>

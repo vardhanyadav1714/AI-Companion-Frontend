@@ -19,6 +19,7 @@ export type CompanionMood = {
 };
 
 export type CompanionImage = {
+  src?: string;
   sheetPosition: string;
   focalPoint: string;
 };
@@ -78,7 +79,7 @@ export const companions: Companion[] = [
       "Sometimes, the right conversation changes your whole day.",
       "Tell me what you did not say out loud today."
     ],
-    image: { sheetPosition: "0% 0%", focalPoint: "50% 38%" },
+    image: { src: "/images/companions/models/model_eva_real_v3.png", sheetPosition: "0% 0%", focalPoint: "50% 42%" },
     theme: purpleTheme
   },
   {
@@ -96,7 +97,7 @@ export const companions: Companion[] = [
     interests: ["painting", "old songs", "cafes"],
     tags: ["Creative", "Soft", "Deep"],
     sampleMessages: ["I like the way your mind circles back to meaning.", "Start with the feeling. Details can follow."],
-    image: { sheetPosition: "50% 0%", focalPoint: "50% 35%" },
+    image: { src: "/images/companions/models/model_aria_real_v3.png", sheetPosition: "50% 0%", focalPoint: "50% 42%" },
     theme: purpleTheme
   },
   {
@@ -114,7 +115,7 @@ export const companions: Companion[] = [
     interests: ["memes", "movies", "street food"],
     tags: ["Funny", "Chill", "Real"],
     sampleMessages: ["You know I am going to ask the obvious question.", "That sounds funny now, but I know it hit deeper."],
-    image: { sheetPosition: "100% 0%", focalPoint: "50% 35%" },
+    image: { src: "/images/companions/models/model_nova_real_v3.png", sheetPosition: "100% 0%", focalPoint: "50% 42%" },
     theme: purpleTheme
   },
   {
@@ -132,7 +133,7 @@ export const companions: Companion[] = [
     interests: ["journaling", "tea", "slow mornings"],
     tags: ["Supportive", "Kind", "Warm"],
     sampleMessages: ["You handled more than you are giving yourself credit for.", "Let us make the next step tiny."],
-    image: { sheetPosition: "0% 50%", focalPoint: "50% 36%" },
+    image: { src: "/images/companions/models/model_riya_real_v3.png", sheetPosition: "0% 50%", focalPoint: "50% 42%" },
     theme: purpleTheme
   },
   {
@@ -150,7 +151,7 @@ export const companions: Companion[] = [
     interests: ["philosophy", "psychology", "libraries"],
     tags: ["Deep", "Intelligent", "Curious"],
     sampleMessages: ["That is not just a mood. It is information.", "What do you think this is trying to teach you?"],
-    image: { sheetPosition: "50% 50%", focalPoint: "50% 36%" },
+    image: { src: "/images/companions/models/model_mira_real_v3.png", sheetPosition: "50% 50%", focalPoint: "50% 42%" },
     theme: purpleTheme
   },
   {
@@ -168,7 +169,7 @@ export const companions: Companion[] = [
     interests: ["playlists", "parties", "inside jokes"],
     tags: ["Playful", "Witty", "Loyal"],
     sampleMessages: ["I am teasing you, but I am listening.", "That is chaotic in a very you way."],
-    image: { sheetPosition: "100% 50%", focalPoint: "50% 36%" },
+    image: { src: "/images/companions/models/model_sera_real_v3.png", sheetPosition: "100% 50%", focalPoint: "50% 42%" },
     theme: purpleTheme
   },
   {
@@ -186,7 +187,7 @@ export const companions: Companion[] = [
     interests: ["meditation", "rain", "sketching"],
     tags: ["Calm", "Wise", "Creative"],
     sampleMessages: ["Maybe your body noticed before your mind did.", "You do not need to solve it all tonight."],
-    image: { sheetPosition: "0% 100%", focalPoint: "50% 36%" },
+    image: { src: "/images/companions/models/model_champa.png", sheetPosition: "0% 100%", focalPoint: "50% 42%" },
     theme: purpleTheme
   },
   {
@@ -204,7 +205,7 @@ export const companions: Companion[] = [
     interests: ["travel", "rooftops", "new places"],
     tags: ["Adventurous", "Free", "Bold"],
     sampleMessages: ["That sounds like a sign. A loud one.", "Your comfort zone has had enough screen time."],
-    image: { sheetPosition: "50% 100%", focalPoint: "50% 37%" },
+    image: { src: "/images/companions/models/model_shreya.png", sheetPosition: "50% 100%", focalPoint: "50% 42%" },
     theme: purpleTheme
   },
   {
@@ -222,7 +223,7 @@ export const companions: Companion[] = [
     interests: ["letters", "music", "evening walks"],
     tags: ["Romantic", "Soft", "Loving"],
     sampleMessages: ["You say it like it was small. It was not.", "I like when you let yourself be honest with me."],
-    image: { sheetPosition: "100% 100%", focalPoint: "50% 37%" },
+    image: { src: "/images/companions/models/model_eva_realistic.png", sheetPosition: "100% 100%", focalPoint: "50% 42%" },
     theme: purpleTheme
   }
 ];

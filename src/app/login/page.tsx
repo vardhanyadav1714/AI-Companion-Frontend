@@ -1,83 +1,182 @@
-import { Apple, EyeOff, Lock, Mail } from "lucide-react";
+"use client";
+
+import { ArrowLeft, CheckCircle2, Mail, MessageCircleHeart, ShieldCheck, Sparkles, UserRound } from "lucide-react";
+import Link from "next/link";
+import { useMemo, useState } from "react";
 
 import { CompanionAvatar } from "@/components/companions/CompanionAvatar";
 import { companions } from "@/lib/companions";
 
+type AuthStage = "entry" | "email" | "otp";
+type AuthMode = "login" | "signup";
+
 export default function LoginPage() {
   const companion = companions[0];
+  const [stage, setStage] = useState<AuthStage>("entry");
+  const [mode, setMode] = useState<AuthMode>("login");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
+  const cleanEmail = email.trim();
+  const canRequestCode = cleanEmail.includes("@") && cleanEmail.length >= 5 && (mode === "login" || name.trim().length >= 2);
+  const canVerify = code.trim().length >= 4;
+  const codeCells = useMemo(() => Array.from({ length: 6 }, (_, index) => code[index] ?? ""), [code]);
+
+  function continueWithEmail() {
+    if (!canRequestCode) {
+      return;
+    }
+
+    setStage("otp");
+  }
 
   return (
-    <main className="auth-page">
-      <section className="auth-visual">
-        <div className="auth-logo">
-          <span className="heart-mark" />
-          <span>Merigf</span>
-        </div>
+    <main className={`eva-auth-flow eva-auth-${stage}`}>
+      <section className="eva-auth-hero" aria-label="Eva introduction">
         <CompanionAvatar companion={companion} size="hero" />
-        <div className="auth-visual-copy">
-          <h1>
-            Your world.
-            <br />
-            Your <span>companion.</span>
-          </h1>
-          <p>Real conversations. Real emotions. AI companions who truly understand you.</p>
+        <div className="eva-auth-hero-overlay" />
+        <div className="eva-auth-brand">
+          <span className="heart-mark" />
+          <span>Eva</span>
+        </div>
+        <div className="eva-auth-hero-copy">
+          <p>AI Companion</p>
+          <h1>Your companion to talk, laugh and feel understood.</h1>
+          <span>Private chats / voice notes / memories that stay</span>
         </div>
       </section>
 
-      <section className="auth-panel-wrap">
-        <div className="auth-panel">
-          <p className="signup-line">
-            Don&apos;t have an account? <a href="/companions">Sign up</a>
-          </p>
-          <div className="auth-heading">
-            <h2>Welcome back</h2>
-            <p>Log in to continue your conversations</p>
-          </div>
+      <section className="eva-auth-sheet" aria-label="Sign in">
+        {stage !== "entry" ? (
+          <button className="eva-back-button" type="button" onClick={() => setStage(stage === "otp" ? "email" : "entry")}>
+            <ArrowLeft size={18} />
+          </button>
+        ) : null}
 
-          <form className="auth-form">
-            <label>
-              Email address
-              <span className="input-shell">
-                <Mail size={20} />
-                <input type="email" placeholder="Enter your email" />
-              </span>
-            </label>
-            <label>
-              Password
-              <span className="input-shell">
-                <Lock size={20} />
-                <input type="password" placeholder="Enter your password" />
-                <EyeOff size={20} />
-              </span>
-            </label>
-            <a className="forgot-link" href="/login">
-              Forgot password?
-            </a>
-            <button className="auth-submit" type="button">
-              Log in
-            </button>
-          </form>
+        <div className="eva-auth-sheet-inner">
+          {stage === "entry" ? (
+            <>
+              <div className="eva-auth-title">
+                <span>
+                  <Sparkles size={16} />
+                  Meet your Eva
+                </span>
+                <h2>Everyone deserves someone who gets them.</h2>
+                <p>Start with a secure sign-in, then choose the companion energy that feels right.</p>
+              </div>
 
-          <div className="auth-divider">
-            <span />
-            <p>or continue with</p>
-            <span />
-          </div>
+              <div className="eva-auth-actions">
+                <button className="eva-auth-choice" type="button" onClick={() => setStage("email")}>
+                  <Mail size={21} />
+                  Continue with Email
+                </button>
+                <button className="eva-auth-choice" type="button">
+                  <b>G</b>
+                  Continue with Google
+                </button>
+              </div>
 
-          <div className="social-stack">
-            <button type="button">
-              <b>G</b>
-              Continue with Google
-            </button>
-            <button type="button">
-              <Apple size={22} />
-              Continue with Apple
-            </button>
-          </div>
+              <div className="eva-trust-row">
+                <span>
+                  <ShieldCheck size={15} />
+                  Secure login
+                </span>
+                <span>
+                  <MessageCircleHeart size={15} />
+                  Private by design
+                </span>
+              </div>
+            </>
+          ) : null}
 
-          <p className="terms-copy">
-            By continuing, you agree to our <a href="/login">Terms of Service</a> and{" "}
-            <a href="/login">Privacy Policy</a>.
+          {stage === "email" ? (
+            <>
+              <div className="eva-auth-progress" aria-hidden="true">
+                <i />
+                <i className="muted" />
+                <i className="muted" />
+              </div>
+              <div className="eva-auth-title compact">
+                <h2>{mode === "login" ? "Welcome back" : "Create an account"}</h2>
+                <p>{mode === "login" ? "Continue your conversation with Eva." : "Tell Eva what to call you first."}</p>
+              </div>
+              <div className="eva-mode-switch" role="tablist" aria-label="Authentication mode">
+                <button className={mode === "login" ? "active" : ""} type="button" onClick={() => setMode("login")}>
+                  Login
+                </button>
+                <button className={mode === "signup" ? "active" : ""} type="button" onClick={() => setMode("signup")}>
+                  Sign up
+                </button>
+              </div>
+              <form className="eva-auth-form" onSubmit={(event) => event.preventDefault()}>
+                {mode === "signup" ? (
+                  <label>
+                    Your name
+                    <span className="eva-input-shell">
+                      <UserRound size={19} />
+                      <input value={name} onChange={(event) => setName(event.target.value)} placeholder="What should Eva call you?" />
+                    </span>
+                  </label>
+                ) : null}
+                <label>
+                  Email address
+                  <span className="eva-input-shell">
+                    <Mail size={19} />
+                    <input
+                      value={email}
+                      onChange={(event) => setEmail(event.target.value)}
+                      type="email"
+                      placeholder="you@example.com"
+                    />
+                  </span>
+                </label>
+                <button className="eva-primary-pill" disabled={!canRequestCode} type="button" onClick={continueWithEmail}>
+                  Send confirmation code
+                </button>
+              </form>
+            </>
+          ) : null}
+
+          {stage === "otp" ? (
+            <>
+              <div className="eva-auth-progress" aria-hidden="true">
+                <i />
+                <i />
+                <i className="muted" />
+              </div>
+              <div className="eva-auth-title compact">
+                <h2>Check your email</h2>
+                <p>
+                  We sent a 6 digit code to <strong>{cleanEmail}</strong>
+                </p>
+              </div>
+              <label className="eva-code-field">
+                <span>Confirmation code</span>
+                <input
+                  value={code}
+                  onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))}
+                  inputMode="numeric"
+                  autoFocus
+                  aria-label="Confirmation code"
+                />
+                <div className="eva-code-cells" aria-hidden="true">
+                  {codeCells.map((digit, index) => (
+                    <i key={index}>{digit}</i>
+                  ))}
+                </div>
+              </label>
+              <p className="eva-resend-copy">
+                Didn&apos;t receive the email? <button type="button">Resend</button>
+              </p>
+              <Link className={`eva-primary-pill ${canVerify ? "" : "disabled"}`} href={canVerify ? "/companions" : "/login"}>
+                <CheckCircle2 size={19} />
+                Verify
+              </Link>
+            </>
+          ) : null}
+
+          <p className="eva-terms">
+            By continuing, you agree to our <a href="/login">Terms of service</a> and <a href="/login">Privacy policy</a>.
           </p>
         </div>
       </section>

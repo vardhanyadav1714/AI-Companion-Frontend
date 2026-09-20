@@ -21,13 +21,13 @@ export function DiscoveryExperience() {
         <header className="discover-topbar">
           <div>
             <h1>
-              Find <span>your</span> person.
+              Choose <span>your</span> Eva.
             </h1>
-            <p>Every companion has a story. What&apos;s yours?</p>
+            <p>Pick the personality, language and energy you want before the first message.</p>
           </div>
           <div className="discover-search">
             <Search size={19} />
-            <input placeholder="Search companions..." aria-label="Search companions" />
+            <input placeholder="Search by mood, language, personality..." aria-label="Search companions" />
           </div>
           <button className="square-tool-button" aria-label="Filter companions">
             <SlidersHorizontal size={18} />
@@ -112,7 +112,7 @@ export function DiscoveryExperience() {
 
         <div className="panel-about">
           <h3>About {selected.name.split(" ")[0]}</h3>
-          <p>{selected.description} She loves {selected.interests.slice(0, 4).join(", ")} and meaningful conversations.</p>
+          <p>{selected.description} She loves {selected.interests.slice(0, 4).join(", ")} and keeps conversations personal.</p>
 
           <dl>
             <div>

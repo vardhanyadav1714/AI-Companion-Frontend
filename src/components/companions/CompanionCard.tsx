@@ -4,7 +4,6 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-import { Button } from "@/components/design/Buttons";
 import { CompanionAvatar } from "@/components/companions/CompanionAvatar";
 import { CompanionBadge } from "@/components/companions/CompanionBadge";
 import { MoodIndicator } from "@/components/companions/MoodIndicator";
@@ -21,7 +20,7 @@ export function CompanionCard({ companion, index }: { companion: Companion; inde
       transition={{ duration: 0.45, delay: index * 0.06 }}
       whileHover={{ y: -6 }}
     >
-      <Link href={`/companions/${companion.id}`} className="companion-card-link" aria-label={`Open ${companion.name}`}>
+      <Link href={`/chat?companion=${companion.id}`} className="companion-card-link" aria-label={`Chat with ${companion.name}`}>
         <div className="companion-card-portrait">
           <CompanionAvatar companion={companion} size="large" />
         </div>
@@ -37,9 +36,12 @@ export function CompanionCard({ companion, index }: { companion: Companion; inde
             ))}
           </div>
           <div className="companion-card-action">
-            <Button href={`/chat?companion=${companion.id}`} icon={<ArrowRight size={17} />} variant="secondary">
+            <span className="button button-secondary">
+              <ArrowRight size={17} />
+              <span>
               Chat with her
-            </Button>
+              </span>
+            </span>
           </div>
         </div>
       </Link>
