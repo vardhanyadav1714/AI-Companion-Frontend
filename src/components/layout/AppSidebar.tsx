@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { apiRequest } from "@/lib/api-client";
 import {
   Compass,
   Crown,
@@ -22,17 +26,23 @@ type AppSidebarProps = {
 const navItems = [
   { key: "home", label: "Home", href: "/", icon: Home },
   { key: "discover", label: "Discover", href: "/companions", icon: Compass },
-  { key: "chats", label: "Chats", href: "/chat?companion=ananya", icon: MessageCircle, badge: "6" },
+  { key: "chats", label: "Chats", href: "/chat?companion=eva", icon: MessageCircle },
   { key: "companions", label: "Companions", href: "/companions", icon: Users },
   { key: "favorites", label: "Favorites", href: "/companions", icon: Heart },
   { key: "profile", label: "Profile", href: "/login", icon: User },
   { key: "settings", label: "Settings", href: "/login", icon: Settings },
-  { key: "subscription", label: "Subscription", href: "/login", icon: Crown }
+  { key: "subscription", label: "Subscription", href: "/subscription", icon: Crown }
 ] as const;
 
 const recentChats = companions.slice(0, 4);
 
 export function AppSidebar({ active }: AppSidebarProps) {
+  const [account, setAccount] = useState("Your account");
+  useEffect(() => {
+    void apiRequest<{ name?: string; preferredName?: string }>("/auth/me").then(result => {
+      if (result.success) setAccount(result.data.preferredName || result.data.name || "Your account");
+    }).catch(() => {});
+  }, []);
   return (
     <aside className="app-sidebar">
       <Link className="app-brand" href="/">
@@ -54,7 +64,6 @@ export function AppSidebar({ active }: AppSidebarProps) {
             >
               <Icon size={19} />
               <span>{item.label}</span>
-              {"badge" in item ? <strong>{item.badge}</strong> : null}
             </Link>
           );
         })}
@@ -85,15 +94,15 @@ export function AppSidebar({ active }: AppSidebarProps) {
           <Crown size={20} />
         </div>
         <p>Unlimited chats, advanced memory, voice calls and exclusive companions.</p>
-        <Link href="/login">Upgrade now</Link>
+        <Link href="/subscription">View plan</Link>
       </div>
 
       <div className="sidebar-user">
         <CompanionAvatar companion={companions[0]} size="small" />
         <span>
-          <b>Vardhan</b>
+          <b>{account}</b>
           <small>
-            <Sparkles size={12} /> Premium
+            <Link href="/subscription">Subscription</Link>
           </small>
         </span>
         <MoreVertical size={18} />

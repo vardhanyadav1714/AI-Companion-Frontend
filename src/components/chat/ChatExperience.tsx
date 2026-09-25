@@ -10,11 +10,6 @@ import { CompanionAvatar } from "@/components/companions/CompanionAvatar";
 import { useChat } from "@/hooks/useChat";
 import { companions, getCompanionById, getCompanionThemeVars } from "@/lib/companions";
 
-const starterReplies = [
-  "I am here. Tell me the real version, slowly.",
-  "That stayed with you, na? Come closer to the feeling and tell me what happened.",
-  "I hear you. Start anywhere, even if it comes out messy."
-];
 
 const quickPrompts = ["I missed you", "Ask about my day", "Talk in Hinglish", "Cheer me up"];
 
@@ -29,21 +24,11 @@ export function ChatExperience() {
         id: "m1",
         role: "assistant" as const,
         content: companion.greeting
-      },
-      {
-        id: "m2",
-        role: "user" as const,
-        content: "Hey, are you there?"
-      },
-      {
-        id: "m3",
-        role: "assistant" as const,
-        content: "Always. I was waiting for you to tell me how your day actually felt."
       }
     ],
     [companion.greeting]
   );
-  const { messages, isTyping, sendMessage } = useChat(initialMessages);
+  const { messages, isTyping, sendMessage, error, paywall } = useChat(initialMessages, companion.id);
 
   useEffect(() => {
     listRef.current?.scrollTo({
@@ -59,8 +44,7 @@ export function ChatExperience() {
       return;
     }
 
-    const reply = starterReplies[Math.floor(Math.random() * starterReplies.length)] ?? starterReplies[0];
-    sendMessage(clean, reply);
+    sendMessage(clean);
     setDraft("");
   }
 
@@ -96,7 +80,7 @@ export function ChatExperience() {
             </Link>
           ))}
         </div>
-        <Link className="eva-rail-upgrade" href="/login">
+        <Link className="eva-rail-upgrade" href="/subscription">
           <Sparkles size={18} />
           <span>Unlock voice, memory and premium companions</span>
         </Link>
@@ -145,9 +129,13 @@ export function ChatExperience() {
           ) : null}
         </div>
 
+        {(error || paywall) && <div className="eva-chat-payment">
+          {error && <p role="alert">{error} <Link href="/login">Sign in</Link></p>}
+          {paywall && <><p>Eva Premium - INR 499/month</p><Link href="/subscription">View plan and continue</Link></>}
+        </div>}
         <div className="eva-quick-prompts">
           {quickPrompts.map((prompt) => (
-            <button type="button" key={prompt} onClick={() => submitMessage(prompt)}>
+            <button type="button" disabled={isTyping || paywall} key={prompt} onClick={() => submitMessage(prompt)}>
               {prompt}
             </button>
           ))}
@@ -158,6 +146,7 @@ export function ChatExperience() {
             <Smile size={21} />
           </button>
           <input
+            disabled={isTyping || paywall}
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
             placeholder={`Message ${companion.name.split(" ")[0]}...`}

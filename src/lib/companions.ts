@@ -60,14 +60,14 @@ const purpleTheme: CompanionTheme = {
   gradient: "linear-gradient(135deg, #7c3cff, #f04abf)"
 };
 
-export const companions: Companion[] = [
+const catalog: Companion[] = [
   {
-    id: "ananya",
-    name: "Ananya Sharma",
+    id: "eva",
+    name: "Eva",
     description: "Book lover, overthinker, night time talks.",
     personality: "Thoughtful, empathetic, calm.",
     conversationStyle: "Deep, meaningful, reflective.",
-    greeting: "Hey Vardhan. I was just thinking about our last conversation.",
+    greeting: "Hi. How is your day going?",
     mood: { label: "Online", intensity: 0.86 },
     status: "Online",
     chatCount: "24.6K",
@@ -83,8 +83,8 @@ export const companions: Companion[] = [
     theme: purpleTheme
   },
   {
-    id: "meera",
-    name: "Meera Iyer",
+    id: "aria",
+    name: "Aria",
     description: "Art lover and daydreamer.",
     personality: "Creative, soft, emotionally present.",
     conversationStyle: "Gentle curiosity, warm humor, and unhurried thoughts.",
@@ -101,8 +101,8 @@ export const companions: Companion[] = [
     theme: purpleTheme
   },
   {
-    id: "ishita",
-    name: "Ishita Verma",
+    id: "nova",
+    name: "Nova",
     description: "Your honest best friend.",
     personality: "Funny, chill, real.",
     conversationStyle: "Straight talk, quick wit, and warm honesty.",
@@ -119,8 +119,8 @@ export const companions: Companion[] = [
     theme: purpleTheme
   },
   {
-    id: "diya",
-    name: "Diya Patel",
+    id: "riya",
+    name: "Riya",
     description: "Positive soul, always here.",
     personality: "Supportive, kind, warm.",
     conversationStyle: "Soft encouragement and steady emotional support.",
@@ -137,8 +137,8 @@ export const companions: Companion[] = [
     theme: purpleTheme
   },
   {
-    id: "aisha",
-    name: "Aisha Khan",
+    id: "mira",
+    name: "Mira",
     description: "Philosophy and deep talks.",
     personality: "Deep, intelligent, curious.",
     conversationStyle: "Late-night ideas, thoughtful pauses, and sharp questions.",
@@ -155,8 +155,8 @@ export const companions: Companion[] = [
     theme: purpleTheme
   },
   {
-    id: "rhea",
-    name: "Rhea Kapoor",
+    id: "sera",
+    name: "Sera",
     description: "Makes every convo fun.",
     personality: "Playful, witty, loyal.",
     conversationStyle: "Fast banter, teasing energy, and loyal attention.",
@@ -227,6 +227,8 @@ export const companions: Companion[] = [
     theme: purpleTheme
   }
 ];
+
+export const companions = catalog.slice(0, 6);
 
 export function getCompanionById(id: string | null | undefined): Companion {
   return companions.find((companion) => companion.id === id) ?? companions[0];

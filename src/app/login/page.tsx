@@ -3,6 +3,8 @@
 import { ArrowLeft, CheckCircle2, Mail, MessageCircleHeart, ShieldCheck, Sparkles, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { apiRequest } from "@/lib/api-client";
 
 import { CompanionAvatar } from "@/components/companions/CompanionAvatar";
 import { companions } from "@/lib/companions";
@@ -12,6 +14,9 @@ type AuthMode = "login" | "signup";
 
 export default function LoginPage() {
   const companion = companions[0];
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
   const [stage, setStage] = useState<AuthStage>("entry");
   const [mode, setMode] = useState<AuthMode>("login");
   const [name, setName] = useState("");
@@ -22,12 +27,28 @@ export default function LoginPage() {
   const canVerify = code.trim().length >= 4;
   const codeCells = useMemo(() => Array.from({ length: 6 }, (_, index) => code[index] ?? ""), [code]);
 
-  function continueWithEmail() {
+  async function continueWithEmail() {
     if (!canRequestCode) {
       return;
     }
 
-    setStage("otp");
+    setBusy(true); setError("");
+    try {
+      const response = await apiRequest("/auth/email/start", { method: "POST", body: JSON.stringify({ email: cleanEmail, name }) });
+      if (!response.success) throw new Error(response.error.message);
+      setStage("otp");
+    } catch (error) { setError(error instanceof Error ? error.message : "Could not send code"); }
+    finally { setBusy(false); }
+  }
+
+  async function verify() {
+    setBusy(true); setError("");
+    try {
+      const response = await apiRequest<{ user: { dateOfBirth?: string } }>("/auth/email/verify", { method: "POST", body: JSON.stringify({ email: cleanEmail, code }) });
+      if (!response.success) throw new Error(response.error.message);
+      router.push(response.data.user.dateOfBirth ? "/companions" : "/onboarding");
+    } catch (error) { setError(error instanceof Error ? error.message : "Could not verify code"); }
+    finally { setBusy(false); }
   }
 
   return (
@@ -54,6 +75,7 @@ export default function LoginPage() {
         ) : null}
 
         <div className="eva-auth-sheet-inner">
+          {error ? <p role="alert">{error}</p> : null}
           {stage === "entry" ? (
             <>
               <div className="eva-auth-title">
@@ -70,7 +92,7 @@ export default function LoginPage() {
                   <Mail size={21} />
                   Continue with Email
                 </button>
-                <button className="eva-auth-choice" type="button">
+                <button className="eva-auth-choice" type="button" disabled title="Google web sign-in is not configured">
                   <b>G</b>
                   Continue with Google
                 </button>
@@ -130,7 +152,7 @@ export default function LoginPage() {
                     />
                   </span>
                 </label>
-                <button className="eva-primary-pill" disabled={!canRequestCode} type="button" onClick={continueWithEmail}>
+                <button className="eva-primary-pill" disabled={busy || !canRequestCode} type="button" onClick={continueWithEmail}>
                   Send confirmation code
                 </button>
               </form>
@@ -166,12 +188,12 @@ export default function LoginPage() {
                 </div>
               </label>
               <p className="eva-resend-copy">
-                Didn&apos;t receive the email? <button type="button">Resend</button>
+                Didn&apos;t receive the email? <button type="button" disabled={busy} onClick={continueWithEmail}>Resend</button>
               </p>
-              <Link className={`eva-primary-pill ${canVerify ? "" : "disabled"}`} href={canVerify ? "/companions" : "/login"}>
+              <button className="eva-primary-pill" disabled={busy || !canVerify} onClick={verify}>
                 <CheckCircle2 size={19} />
                 Verify
-              </Link>
+              </button>
             </>
           ) : null}
 

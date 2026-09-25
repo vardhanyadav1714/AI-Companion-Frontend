@@ -3596,3 +3596,13 @@ body {
     padding: 0 14px;
   }
 }
+:root { --onboarding-width: 380px; }
+.eva-billing { width: min(100%, 420px); display: grid; gap: 20px; }
+.eva-billing h1 { font-size: 28px; }
+.eva-chat-payment { padding: 12px 18px; border-top: 1px solid #49414e; background: #17131b; }
+.eva-chat-payment p { margin: 6px 0; font-size: 14px; overflow-wrap: anywhere; }
+.eva-onboarding { min-height: 100dvh; display: grid; place-items: center; padding: 24px; }
+.eva-onboarding form { width: 100%; max-width: var(--onboarding-width); display: grid; gap: 20px; }
+.eva-onboarding h1 { font-size: 26px; }
+.eva-onboarding label { display: grid; gap: 8px; }
+.eva-onboarding input { min-width: 0; width: 100%; padding: 12px; border: 1px solid #727272; border-radius: 6px; background: transparent; color: inherit; }
