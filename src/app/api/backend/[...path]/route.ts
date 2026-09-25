@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isAllowedRequestOrigin } from "@/lib/request-origin";
 
 async function forward(request: NextRequest, context: { params: Promise<{ path: string[] }> }) {
   const { path } = await context.params;
   const base = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4000/api/v1";
   const target = `${base.replace(/\/$/, "")}/${path.map(encodeURIComponent).join("/")}${request.nextUrl.search}`;
-  if (request.method !== "GET" && request.headers.get("origin") !== request.nextUrl.origin) {
-    return NextResponse.json({ success: false, error: { message: "Invalid request origin" } }, { status: 403 });
+  if (request.method !== "GET" && !isAllowedRequestOrigin(
+    request.headers.get("origin"), request.nextUrl.origin,
+    process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL,
+    process.env.NODE_ENV === "production"
+  )) {
+    return NextResponse.json({ success: false, error: { code: "FORBIDDEN", message: "Invalid request origin" } }, { status: 403 });
   }
   let token = request.cookies.get("eva_access")?.value;
   let refreshed: { accessToken: string; refreshToken?: string } | undefined;
