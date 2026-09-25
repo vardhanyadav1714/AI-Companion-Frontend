@@ -8,8 +8,8 @@ export const metadata: Metadata = {
   title: { default: "Eva - Your AI companions", template: "%s | Eva" },
   description: "Your own little corner for thoughtful conversations with AI companions.",
   icons: {
-    icon: [{ url: "/branding/eva-icon-192.png?v=2", type: "image/png", sizes: "192x192" }],
-    shortcut: "/favicon.ico?v=2"
+    icon: [{ url: "/branding/eva-icon-192.png?v=3", type: "image/png", sizes: "192x192" }],
+    shortcut: "/favicon.ico?v=3"
   }
 };
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: [{ media: "(prefers-color-scheme: light)", color: "#f8f9fa" }, { media: "(prefers-color-scheme: dark)", color: "#141517" }] };
