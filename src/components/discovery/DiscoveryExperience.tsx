@@ -1,147 +1,32 @@
 "use client";
 
-import { ChevronRight, Heart, MessageCircle, MoreVertical, Phone, Search, SlidersHorizontal } from "lucide-react";
+import { ArrowUpRight, Heart, Search, X, MessageCircle, SlidersHorizontal } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
+import { Portrait } from "@/components/companions/Portrait";
+import { AppShell } from "@/components/layout/AppShell";
+import { useFavorites } from "@/hooks/useFavorites";
+import { companions } from "@/lib/companions";
 
-import { CompanionAvatar } from "@/components/companions/CompanionAvatar";
-import { CompanionBadge } from "@/components/companions/CompanionBadge";
-import { AppSidebar } from "@/components/layout/AppSidebar";
-import { type Companion, companions, getCompanionThemeVars } from "@/lib/companions";
-
-const filters = ["All", "Popular", "New", "Romantic", "Funny", "Study", "Mentor", "Adventure", "Roleplay"];
-
-export function DiscoveryExperience() {
-  const [selected, setSelected] = useState<Companion>(companions[0]);
-
-  return (
-    <main className="app-shell discovery-shell" style={getCompanionThemeVars(selected)}>
-      <AppSidebar active="discover" />
-
-      <section className="discover-main">
-        <header className="discover-topbar">
-          <div>
-            <h1>
-              Choose <span>your</span> Eva.
-            </h1>
-            <p>Pick the personality, language and energy you want before the first message.</p>
-          </div>
-          <div className="discover-search">
-            <Search size={19} />
-            <input placeholder="Search by mood, language, personality..." aria-label="Search companions" />
-          </div>
-          <button className="square-tool-button" aria-label="Filter companions">
-            <SlidersHorizontal size={18} />
-          </button>
-        </header>
-
-        <div className="filter-row" aria-label="Companion filters">
-          {filters.map((filter, index) => (
-            <button className={index === 0 ? "active" : ""} key={filter}>
-              {filter}
-            </button>
-          ))}
-          <ChevronRight size={22} />
-        </div>
-
-        <div className="discover-card-grid">
-          {companions.map((companion) => (
-            <button
-              className={`discover-card ${selected.id === companion.id ? "active" : ""}`}
-              key={companion.id}
-              onClick={() => setSelected(companion)}
-              style={getCompanionThemeVars(companion)}
-            >
-              <CompanionAvatar companion={companion} size="large" />
-              <span className={`status-pill ${companion.status.toLowerCase()}`}>
-                <i />
-                {companion.status}
-              </span>
-              <span className="discover-card-copy">
-                <strong>{companion.name}</strong>
-                <small>{companion.description}</small>
-                <span className="mini-tags">
-                  {companion.tags.slice(0, 3).map((tag) => (
-                    <em key={tag}>{tag}</em>
-                  ))}
-                </span>
-                <span className="chat-count">
-                  <MessageCircle size={14} />
-                  {companion.chatCount} chats
-                </span>
-              </span>
-              <span className="card-chat-button">
-                <MessageCircle size={18} />
-              </span>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <aside className="discover-profile-panel">
-        <div className="profile-panel-hero">
-          <CompanionAvatar companion={selected} size="hero" />
-          <button className="panel-floating-button panel-back" aria-label="Back">
-            <ChevronRight size={18} />
-          </button>
-          <button className="panel-floating-button panel-menu" aria-label="More options">
-            <MoreVertical size={18} />
-          </button>
-          <div className="profile-panel-copy">
-            <h2>{selected.name}</h2>
-            <p className={`status-line ${selected.status.toLowerCase()}`}>
-              <i />
-              {selected.status === "Online" ? "Online now" : "Away"}
-            </p>
-          </div>
-        </div>
-
-        <div className="panel-actions">
-          <a href={`/chat?companion=${selected.id}`}>
-            <MessageCircle size={22} />
-            <span>Start Chat</span>
-          </a>
-          <button>
-            <Phone size={22} />
-            <span>Voice Call</span>
-          </button>
-          <button>
-            <Heart size={22} />
-            <span>Add to Fav</span>
-          </button>
-        </div>
-
-        <div className="panel-about">
-          <h3>About {selected.name.split(" ")[0]}</h3>
-          <p>{selected.description} She loves {selected.interests.slice(0, 4).join(", ")} and keeps conversations personal.</p>
-
-          <dl>
-            <div>
-              <dt>Personality</dt>
-              <dd>{selected.personality}</dd>
-            </div>
-            <div>
-              <dt>Conversation Style</dt>
-              <dd>{selected.conversationStyle}</dd>
-            </div>
-            <div>
-              <dt>Interests</dt>
-              <dd>{selected.interests.join(", ")}</dd>
-            </div>
-            <div>
-              <dt>Language</dt>
-              <dd>{selected.language}</dd>
-            </div>
-          </dl>
-
-          <blockquote>{selected.sampleMessages[0]}</blockquote>
-
-          <div className="badge-row">
-            {selected.traits.map((trait) => (
-              <CompanionBadge key={trait} label={trait} />
-            ))}
-          </div>
-        </div>
-      </aside>
-    </main>
-  );
+const moods: Record<string, string[]> = { "Everyone": companions.map(c => c.id), "A listening ear": ["eva", "riya", "mira"], "A little laughter": ["nova", "sera"], "Something deeper": ["aria", "mira", "eva"] };
+export function DiscoveryExperience({ savedOnly = false }: { savedOnly?: boolean }) {
+  const [query, setQuery] = useState("");
+  const [mood, setMood] = useState("Everyone");
+  const [language, setLanguage] = useState("All languages");
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const { favorites, toggle, ready } = useFavorites();
+  const shown = companions.filter(c => (!savedOnly || favorites.includes(c.id)) && moods[mood].includes(c.id) && (language === "All languages" || c.language.includes(language)) && `${c.name} ${c.personality} ${c.interests.join(" ")} ${c.language}`.toLowerCase().includes(query.toLowerCase().trim()));
+  return <AppShell active={savedOnly ? "saved" : "discover"} title={savedOnly ? "Your saved companions" : "Discover"}>
+    <div className="e-discovery"><header className="e-page-heading"><div><span className="e-eyebrow">{savedOnly ? "CLOSE TO YOU" : "GOOD COMPANY, YOUR WAY"}</span><h1>{savedOnly ? "Your favorites" : "Meet your companions"}</h1><p>{savedOnly ? "Familiar faces. Conversations to come back to." : "For the big feelings, little wins, and everything in between."}</p></div><span className="e-label"><span className="e-status-dot" /> AI companions</span></header>
+      <div className="e-discovery-tools"><div className="e-search"><Search size={19} /><input aria-label="Search companions" placeholder="Find your kind of company" value={query} onChange={e => setQuery(e.target.value)} />{query && <button className="e-icon" onClick={() => setQuery("")} aria-label="Clear search"><X size={16} /></button>}</div><button className="e-button e-secondary" aria-expanded={filtersOpen} onClick={() => setFiltersOpen(!filtersOpen)}><SlidersHorizontal size={17} /><span>Filters</span></button></div>
+      {filtersOpen && <div className="e-filter-settings"><label>Language<select value={language} onChange={e => setLanguage(e.target.value)}>{["All languages", "English", "Hindi", "Tamil"].map(l => <option key={l}>{l}</option>)}</select></label><button className="e-text-button" onClick={() => { setLanguage("All languages"); setMood("Everyone"); setQuery(""); }}>Reset filters</button></div>}
+      <div className="e-mood-tabs" role="group" aria-label="Conversation mood">{Object.keys(moods).map(m => <button key={m} aria-pressed={mood === m} onClick={() => setMood(m)}>{m}</button>)}<span>{shown.length} companions</span></div>
+      <div className="e-companion-grid">{shown.map((c, i) => <article className="e-companion" key={c.id}>
+        <div className="e-companion-image"><Link href={`/companions/${c.id}`} aria-label={`Meet ${c.name}`}><Portrait companion={c} priority={i < 3} /></Link><button className="e-save" disabled={!ready} aria-pressed={favorites.includes(c.id)} aria-label={`${favorites.includes(c.id) ? "Unsave" : "Save"} ${c.name}`} title={`${favorites.includes(c.id) ? "Unsave" : "Save"} ${c.name}`} onClick={() => toggle(c.id)}><Heart size={19} fill={favorites.includes(c.id) ? "currentColor" : "none"} /></button><span className="e-image-label">{c.tags[0]}</span></div>
+        <div className="e-companion-copy"><div className="e-card-heading"><Link href={`/companions/${c.id}`}><h2>{c.name}</h2></Link><span>{c.language}</span></div><p>{c.description}</p><div className="e-card-footer"><span>{c.tags.slice(1).join(" / ")}</span><Link href={`/chat?companion=${c.id}`} className="e-chat-link" aria-label={`Chat with ${c.name}`}><MessageCircle size={17} /><span>Chat</span><ArrowUpRight size={15} /></Link></div></div>
+      </article>)}</div>
+      {savedOnly && !ready ? <p role="status">Loading favorites...</p> : shown.length === 0 && <div className="e-empty"><Heart size={30} /><h2>{savedOnly && !favorites.length ? "Your favorites start here" : "No companions found"}</h2><p>{savedOnly && !favorites.length ? "A familiar face makes all the difference." : "No matches for the current search and filters."}</p>{savedOnly && !favorites.length ? <Link className="e-button e-secondary" href="/companions">Explore companions</Link> : <button className="e-button e-secondary" onClick={() => { setQuery(""); setMood("Everyone"); setLanguage("All languages"); }}>Clear filters</button>}</div>}
+      <footer className="e-discovery-footer"><span>A little space to be yourself.</span><Link href="/subscription">More time together <ArrowUpRight size={15} /></Link></footer>
+    </div>
+  </AppShell>;
 }

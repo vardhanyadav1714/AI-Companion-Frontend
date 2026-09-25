@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiRequest } from "@/lib/api-client";
+import { Brand } from "@/components/layout/AppShell";
+import { ThemeSwitcher } from "@/components/layout/ThemeProvider";
 
 export default function Onboarding() {
   const router = useRouter();
@@ -10,7 +12,7 @@ export default function Onboarding() {
   const [birthday, setBirthday] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  return <main className="eva-onboarding"><form onSubmit={async event => {
+  return <main className="e-auth"><header><Brand /><ThemeSwitcher /></header><section className="e-auth-content"><form className="e-form" onSubmit={async event => {
     event.preventDefault(); setBusy(true); setError("");
     try {
       const result = await apiRequest("/profile", { method: "PUT", body: JSON.stringify({ preferredName: name, dateOfBirth: birthday }) });
@@ -23,6 +25,6 @@ export default function Onboarding() {
     <label>Birthday<input required type="date" autoComplete="bday" value={birthday} onChange={event => setBirthday(event.target.value)} /></label>
     <p>Your companions can remember these details. You must be 18 or older.</p>
     {error && <p role="alert">{error}</p>}
-    <button className="eva-primary-pill" disabled={busy}>{busy ? "Saving..." : "Continue"}</button>
-  </form></main>;
+    <button className="e-button e-primary" disabled={busy}>{busy ? "Saving..." : "Continue"}</button>
+  </form></section></main>;
 }

@@ -1,202 +1,36 @@
 "use client";
-
-import { ArrowLeft, Heart, Mic2, MoreVertical, Paperclip, Phone, SendHorizontal, Smile, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Heart, Send, Crown, Info, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-
-import { TypingIndicator } from "@/components/chat/TypingIndicator";
-import { CompanionAvatar } from "@/components/companions/CompanionAvatar";
+import { AppShell } from "@/components/layout/AppShell";
+import { Portrait } from "@/components/companions/Portrait";
 import { useChat } from "@/hooks/useChat";
-import { companions, getCompanionById, getCompanionThemeVars } from "@/lib/companions";
-
-
-const quickPrompts = ["I missed you", "Ask about my day", "Talk in Hinglish", "Cheer me up"];
+import { useFavorites } from "@/hooks/useFavorites";
+import { companions, getCompanionById } from "@/lib/companions";
 
 export function ChatExperience() {
   const params = useSearchParams();
   const companion = getCompanionById(params.get("companion"));
   const [draft, setDraft] = useState("");
-  const listRef = useRef<HTMLDivElement | null>(null);
-  const initialMessages = useMemo(
-    () => [
-      {
-        id: "m1",
-        role: "assistant" as const,
-        content: companion.greeting
-      }
-    ],
-    [companion.greeting]
-  );
-  const { messages, isTyping, sendMessage, error, paywall } = useChat(initialMessages, companion.id);
-
-  useEffect(() => {
-    listRef.current?.scrollTo({
-      top: listRef.current.scrollHeight,
-      behavior: "smooth"
-    });
-  }, [messages.length, isTyping]);
-
-  function submitMessage(content: string) {
-    const clean = content.trim();
-
-    if (!clean) {
-      return;
-    }
-
-    sendMessage(clean);
-    setDraft("");
-  }
-
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    submitMessage(draft);
-  }
-
-  return (
-    <main className="eva-chat-layout" style={getCompanionThemeVars(companion)}>
-      <aside className="eva-chat-rail">
-        <Link className="app-brand" href="/">
-          <span className="heart-mark" />
-          <span>Eva</span>
-        </Link>
-        <div className="eva-chat-rail-heading">
-          <span>Conversations</span>
-          <small>{companions.length} companions</small>
-        </div>
-        <div className="eva-chat-list">
-          {companions.slice(0, 6).map((item) => (
-            <Link
-              className={`eva-chat-person ${item.id === companion.id ? "active" : ""}`}
-              href={`/chat?companion=${item.id}`}
-              key={item.id}
-              style={getCompanionThemeVars(item)}
-            >
-              <CompanionAvatar companion={item} size="small" />
-              <span>
-                <b>{item.name.split(" ")[0]}</b>
-                <small>{item.status === "Online" ? "Online now" : "Away"}</small>
-              </span>
-            </Link>
-          ))}
-        </div>
-        <Link className="eva-rail-upgrade" href="/subscription">
-          <Sparkles size={18} />
-          <span>Unlock voice, memory and premium companions</span>
-        </Link>
-      </aside>
-
-      <section className="eva-chat-phone" aria-label={`${companion.name} chat`}>
-        <header className="eva-chat-header">
-          <Link className="eva-chat-icon" href="/companions" aria-label="Back to companions">
-            <ArrowLeft size={21} />
-          </Link>
-          <CompanionAvatar companion={companion} size="small" />
-          <div>
-            <h1>{companion.name.split(" ")[0]}</h1>
-            <p>
-              <i />
-              {companion.status === "Online" ? "Live" : "Away"}
-            </p>
-          </div>
-          <span />
-          <button className="eva-chat-icon" type="button" aria-label="Voice call">
-            <Phone size={20} />
-          </button>
-          <button className="eva-chat-icon" type="button" aria-label="More options">
-            <MoreVertical size={20} />
-          </button>
-        </header>
-
-        <div className="eva-chat-messages" ref={listRef} aria-live="polite">
-          <span className="day-pill">Today</span>
-          {messages.map((message) => (
-            <div className={`eva-message-row eva-message-${message.role}`} key={message.id}>
-              {message.role === "assistant" ? <CompanionAvatar companion={companion} size="small" /> : null}
-              <div className="eva-message-bubble">
-                <p>{message.content}</p>
-                <time>Now</time>
-              </div>
-            </div>
-          ))}
-          {isTyping ? (
-            <div className="eva-message-row eva-message-assistant">
-              <CompanionAvatar companion={companion} size="small" />
-              <div className="eva-message-bubble eva-typing-bubble">
-                <TypingIndicator />
-              </div>
-            </div>
-          ) : null}
-        </div>
-
-        {(error || paywall) && <div className="eva-chat-payment">
-          {error && <p role="alert">{error} <Link href="/login">Sign in</Link></p>}
-          {paywall && <><p>Eva Premium - INR 499/month</p><Link href="/subscription">View plan and continue</Link></>}
-        </div>}
-        <div className="eva-quick-prompts">
-          {quickPrompts.map((prompt) => (
-            <button type="button" disabled={isTyping || paywall} key={prompt} onClick={() => submitMessage(prompt)}>
-              {prompt}
-            </button>
-          ))}
-        </div>
-
-        <form className="eva-chat-composer" onSubmit={handleSubmit}>
-          <button type="button" aria-label="Emoji">
-            <Smile size={21} />
-          </button>
-          <input
-            disabled={isTyping || paywall}
-            value={draft}
-            onChange={(event) => setDraft(event.target.value)}
-            placeholder={`Message ${companion.name.split(" ")[0]}...`}
-            aria-label={`Message ${companion.name}`}
-          />
-          <button type="button" aria-label="Attach">
-            <Paperclip size={21} />
-          </button>
-          <button className="send" type={draft.trim() ? "submit" : "button"} aria-label={draft.trim() ? "Send" : "Voice"}>
-            {draft.trim() ? <SendHorizontal size={21} /> : <Mic2 size={22} />}
-          </button>
-        </form>
-      </section>
-
-      <aside className="eva-chat-profile-panel">
-        <div className="eva-profile-photo">
-          <CompanionAvatar companion={companion} size="hero" />
-          <span>
-            <i />
-            {companion.status}
-          </span>
-        </div>
-        <div className="eva-profile-copy">
-          <h2>{companion.name}</h2>
-          <p>{companion.description}</p>
-          <div className="mini-tags">
-            {companion.tags.map((tag) => (
-              <em key={tag}>{tag}</em>
-            ))}
-          </div>
-          <dl>
-            <div>
-              <dt>Personality</dt>
-              <dd>{companion.personality}</dd>
-            </div>
-            <div>
-              <dt>Style</dt>
-              <dd>{companion.conversationStyle}</dd>
-            </div>
-            <div>
-              <dt>Language</dt>
-              <dd>{companion.language}</dd>
-            </div>
-          </dl>
-          <Link className="eva-profile-cta" href="/login">
-            <Heart size={18} />
-            Save as favorite
-          </Link>
-        </div>
-      </aside>
-    </main>
-  );
+  const [info, setInfo] = useState(false);
+  const list = useRef<HTMLDivElement>(null);
+  const activeCompanion = useRef(companion.id); activeCompanion.current = companion.id;
+  const initial = useMemo(() => [{ id: "greeting", role: "assistant" as const, content: companion.greeting }], [companion.greeting]);
+  const { messages, loading, historyFailed, retryHistory, isTyping, sendMessage, error, paywall, authRequired } = useChat(initial, companion.id);
+  const { favorites, toggle, ready } = useFavorites();
+  useEffect(() => { setDraft(""); setInfo(false); }, [companion.id]);
+  useEffect(() => { list.current?.scrollTo({ top: list.current.scrollHeight, behavior: "smooth" }); }, [messages, isTyping]);
+  async function send(content: string) { const id = companion.id; if (await sendMessage(content.trim()) && activeCompanion.current === id) setDraft(""); }
+  const disabled = loading || historyFailed || isTyping || paywall || authRequired;
+  return <AppShell active="chat" title="Conversations" className="e-chat-app"><div className="e-chat-workspace">
+    <aside className="e-chat-contacts"><h2>Your companions</h2>{companions.map(c => <Link href={`/chat?companion=${c.id}`} key={c.id} aria-current={c.id === companion.id ? "page" : undefined}><Portrait companion={c} small /><span><strong>{c.name}</strong><small>{c.tags.slice(0, 2).join(" / ")}</small></span></Link>)}</aside>
+    <section className="e-conversation" aria-label={`Chat with ${companion.name}`}><header className="e-conversation-header"><Link className="e-icon" href="/companions" aria-label="Back to companions"><ArrowLeft size={19} /></Link><Portrait companion={companion} small /><div><h1>{companion.name}</h1><span>AI companion</span></div><button className="e-icon" aria-label={`About ${companion.name}`} aria-expanded={info} title={`About ${companion.name}`} onClick={() => setInfo(!info)}><Info size={21} /></button><button className="e-icon" aria-label="Save companion" title="Save companion" aria-pressed={favorites.includes(companion.id)} disabled={!ready} onClick={() => toggle(companion.id)}><Heart size={21} fill={favorites.includes(companion.id) ? "currentColor" : "none"} /></button></header>
+      {info && <div className="e-chat-info"><p>{companion.description} {companion.personality}</p><Link href={`/companions/${companion.id}`}>View profile <ArrowUpRight size={14} /></Link></div>}
+      <div className="e-messages" ref={list} role="log" aria-label="Conversation messages" aria-live="polite"><div className="e-chat-welcome"><Portrait companion={companion} small /><h2>A moment with {companion.name}</h2><p>{companion.description}</p></div>{loading ? <p className="e-muted" role="status">Loading your conversation...</p> : messages.map(m => <div className={`e-message e-message-${m.role}`} key={m.id}><span className="e-message-author">{m.role === "user" ? "You" : companion.name}</span><p>{m.content}</p></div>)}{isTyping && <div className="e-message e-message-assistant e-typing" role="status"><span>{companion.name} is thinking</span><i /><i /><i /></div>}</div>
+      {paywall ? <div className="e-chat-notice"><Crown size={22} /><div><strong>Your free messages are all used</strong><p>Keep the conversation going with Eva Premium.</p></div><Link className="e-button" href="/subscription">View plan</Link></div> : authRequired ? <div className="e-chat-notice"><MessageCircle size={22} /><div><strong>A conversation starts with hello.</strong><p>Sign in to chat with {companion.name}.</p></div><Link href="/login" className="e-button">Sign in</Link></div> : error && <p className="e-alert" role="alert">{error}</p>}
+      <div className="e-composer-area"><div className="e-suggestions">{["How was your day?", "I have something on my mind", "Make me smile"].map(p => <button key={p} disabled={disabled} onClick={() => setDraft(p)}>{p}</button>)}</div><form className="e-composer" onSubmit={e => { e.preventDefault(); void send(draft); }}><textarea rows={1} maxLength={4000} disabled={disabled} aria-label={`Message ${companion.name}`} placeholder={`Message ${companion.name}...`} value={draft} onChange={e => setDraft(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); if (!disabled) void send(draft); } }} /><button className="e-send" type="submit" disabled={disabled || !draft.trim()} aria-label="Send message" title="Send message"><Send size={19} /></button></form><p className="e-composer-note">Eva is AI, not a person. Take what helps, leave what doesn&apos;t.</p></div>
+      {historyFailed && !authRequired && <button className="e-button e-secondary" onClick={retryHistory}>Retry loading conversation</button>}
+    </section>
+  </div></AppShell>;
 }
