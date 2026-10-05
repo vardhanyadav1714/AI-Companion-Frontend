@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Check, CreditCard, RefreshCw, Crown } from "lucide-react";
+import { Check, CreditCard, RefreshCw, Crown, ExternalLink, CircleX } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { apiRequest } from "@/lib/api-client";
 
 type Plan = { amount: number; currency: string; interval: string; planId: string };
-type Status = { active: boolean; status: string; currentEnd?: string; usage: { premium: boolean; freeRemaining: number | null } };
+type Status = { active: boolean; status: string; provider?: string; autoRenew?: boolean; cancelAtPeriodEnd?: boolean; currentEnd?: string; usage: { premium: boolean; freeRemaining: number | null; freeLimit?: number } };
 export default function SubscriptionPage() {
   const [status, setStatus] = useState<Status | null>(null);
   const [plan, setPlan] = useState<Plan | null>(null);
@@ -15,6 +15,7 @@ export default function SubscriptionPage() {
   const [error, setError] = useState("");
   const [authRequired, setAuthRequired] = useState(false);
   const [pending, setPending] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false);
   async function refresh(sync = false) {
     setBusy(true); setError("");
     try {
@@ -48,17 +49,30 @@ export default function SubscriptionPage() {
     } catch (e) { setError(e instanceof Error ? e.message : "Could not start checkout. Please try again."); }
     finally { setBusy(false); }
   }
+  async function cancelRenewal() {
+    setBusy(true); setError("");
+    try {
+      const result = await apiRequest<{ subscription: Omit<Status, "usage">; usage: Status["usage"] }>("/subscriptions/cancel", { method: "POST", body: "{}" });
+      if (!result.success) throw new Error(result.error.message);
+      setStatus({ ...result.data.subscription, usage: result.data.usage });
+      setConfirmCancel(false);
+    } catch (e) { setError(e instanceof Error ? e.message : "Could not cancel future renewals."); }
+    finally { setBusy(false); }
+  }
   return <AppShell active="subscription" title="Premium"><section className="e-billing-page">
-    <header className="e-page-heading"><div><p className="e-eyebrow">MORE TIME TOGETHER</p><h1>Eva Premium</h1><p>Your conversations, without the ten-message trial limit.</p></div></header>
+    <header className="e-page-heading"><div><p className="e-eyebrow">MORE TIME TOGETHER</p><h1>Eva Premium</h1><p>One monthly membership across your Eva account.</p></div></header>
     <div className="e-billing-layout"><section className="e-plan"><Crown size={27} /><h2>Monthly membership</h2><div className="e-price">INR 499<span> / month</span></div>
-      <ul><li><Check size={18} />Continue beyond your first 10 messages</li><li><Check size={18} />Talk with every companion</li><li><Check size={18} />Keep your conversations in one account</li></ul>
+      <ul><li><Check size={18} />Monthly Premium membership</li><li><Check size={18} />Talk with every companion</li><li><Check size={18} />Keep your conversations in one account</li></ul>
       <p className="e-fine">Auto-renews monthly until cancelled. Manage future renewals through your payment provider.</p>
       {status?.usage.premium ? <Link className="e-button e-primary" href="/chat">Continue chatting</Link> : authRequired ? <Link className="e-button e-primary" href="/login">Sign in to continue</Link> : <button className="e-button e-primary" disabled={busy || !ready || !status} onClick={checkout}><CreditCard size={18} />{busy ? "Checking..." : "Continue with Razorpay"}</button>}
       {!ready && !status?.usage.premium && <p className="e-fine">The INR 499 checkout is not available yet. No payment has been taken.</p>}
     </section><section className="e-billing-status"><h2>Your membership</h2>
       <span className="e-label">{busy ? "Checking status" : status?.usage.premium ? "Premium active" : status ? "Free account" : "Not signed in"}</span>
-      {status && !status.usage.premium && status.usage.freeRemaining !== null && <p>{status.usage.freeRemaining} of 10 free messages remaining</p>}
+      {status && !status.usage.premium && status.usage.freeRemaining !== null && <p>{status.usage.freeRemaining} of {status.usage.freeLimit ?? 10} free messages remaining</p>}
       {status?.currentEnd && <p>Current period ends {new Date(status.currentEnd).toLocaleDateString("en-IN")}</p>}
+      {status?.cancelAtPeriodEnd && <p role="status">Future renewals are cancelled. Your current paid period remains available until its end date.</p>}
+      {status?.provider === "google_play" && <a className="e-button e-secondary" href="https://play.google.com/store/account/subscriptions?sku=eva_premium_monthly&package=com.eva.ai" target="_blank" rel="noopener noreferrer"><ExternalLink size={17} />Manage in Google Play</a>}
+      {status?.provider === "razorpay" && status.active && !status.cancelAtPeriodEnd && (confirmCancel ? <div role="group" aria-label="Confirm renewal cancellation"><p>Cancel future renewals? Your current paid period remains available.</p><button className="e-button e-secondary" disabled={busy} onClick={cancelRenewal}><CircleX size={17} />Confirm cancellation</button><button className="e-button e-secondary" disabled={busy} onClick={() => setConfirmCancel(false)}>Keep membership</button></div> : <button className="e-button e-secondary" disabled={busy} onClick={() => setConfirmCancel(true)}><CircleX size={17} />Cancel future renewals</button>)}
       {pending && !status?.usage.premium && <p role="status">Payment confirmation is pending. Your membership activates after verification by the payment provider.</p>}
       {error && <p className="e-form-error" role="alert">{error}</p>}
       <button className="e-button e-secondary" disabled={busy} onClick={() => refresh(true)}><RefreshCw size={17} />Refresh payment status</button>
