@@ -64,6 +64,7 @@ export default function SubscriptionPage() {
     <div className="e-billing-layout"><section className="e-plan"><Crown size={27} /><h2>Monthly membership</h2><div className="e-price">INR 499<span> / month</span></div>
       <ul><li><Check size={18} />Monthly Premium membership</li><li><Check size={18} />Talk with every companion</li><li><Check size={18} />Keep your conversations in one account</li></ul>
       <p className="e-fine">Auto-renews monthly until cancelled. Manage future renewals through your payment provider.</p>
+      <p className="e-fine e-legal-consent">By purchasing, you agree to our <Link href="/terms">Terms</Link>. No discretionary refunds for unused time or change of mind; legal and provider exceptions apply. Read the <Link href="/refund-policy">Cancellation &amp; Refund Policy</Link>.</p>
       {status?.usage.premium ? <Link className="e-button e-primary" href="/chat">Continue chatting</Link> : authRequired ? <Link className="e-button e-primary" href="/login">Sign in to continue</Link> : <button className="e-button e-primary" disabled={busy || !ready || !status} onClick={checkout}><CreditCard size={18} />{busy ? "Checking..." : "Continue with Razorpay"}</button>}
       {!ready && !status?.usage.premium && <p className="e-fine">The INR 499 checkout is not available yet. No payment has been taken.</p>}
     </section><section className="e-billing-status"><h2>Your membership</h2>

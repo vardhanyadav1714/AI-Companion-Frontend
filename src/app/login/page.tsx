@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { ArrowRight, Mail } from "lucide-react";
 import { Brand } from "@/components/layout/AppShell";
 import { ThemeSwitcher } from "@/components/layout/ThemeProvider";
@@ -44,6 +45,7 @@ export default function LoginPage() {
       <button className="e-button e-primary" disabled={busy || (sent && code.length !== 6)}>{busy ? "Please wait..." : sent ? "Sign in" : "Continue with email"}<ArrowRight size={18} /></button>
     </form>
     {sent && <div className="e-auth-secondary"><button className="e-text-button" disabled={busy || cooldown > 0} onClick={send}>{cooldown ? `Resend in ${cooldown}s` : "Resend code"}</button><button className="e-text-button" disabled={busy} onClick={() => { setSent(false); setError(""); }}>Change email</button></div>}
+    <p className="e-fine e-legal-consent">By continuing, you agree to our <Link href="/terms">Terms &amp; Conditions</Link> and acknowledge our <Link href="/refund-policy">Cancellation &amp; Refund Policy</Link>.</p>
     <p className="e-fine">For adults 18 and over. Conversations are with AI.</p>
   </section></main>;
 }

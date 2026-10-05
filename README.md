@@ -34,3 +34,17 @@ NEXT_PUBLIC_API_BASE_URL=https://api.merigf.com/api/v1
 ```
 
 Do not put AI provider keys, Google secrets, JWT secrets, or database credentials in frontend env variables.
+
+## Public Legal Pages
+
+`/terms` and `/refund-policy` are public, mobile-friendly pages linked from website
+sign-in, checkout, and the Android app's sign-in/sign-up screen. The policy excludes
+discretionary refunds, but preserves mandatory legal and payment-provider remedies.
+Do not remove refund webhook processing: provider reversals still need accounting
+and membership updates.
+
+Set `EVA_LEGAL_OPERATOR_NAME` to the actual service operator and `EVA_SUPPORT_EMAIL`
+to a monitored support address in Coolify **as build-time variables**, then rebuild
+and deploy. Both values are published on these static pages, not secrets. They are
+omitted when unset; supply them and have the policies reviewed before public release.
+The Terms are not a substitute for a separate privacy notice.

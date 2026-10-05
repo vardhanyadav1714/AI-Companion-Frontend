@@ -1,0 +1,20 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { LegalPage } from "@/components/layout/LegalPage";
+
+export const metadata: Metadata = {
+  title: "Cancellation & Refund Policy | Eva",
+  description: "Eva's no-discretionary-refunds policy, renewal cancellation and payment-provider exceptions.",
+  alternates: { canonical: "https://merigf.com/refund-policy" }
+};
+
+export default function RefundPolicyPage() {
+  return <LegalPage title="Cancellation & Refund Policy" summary="Eva subscriptions are non-refundable except where a refund or other remedy is required by applicable law or the payment provider. You can cancel future renewals.">
+    <section><h2>1. No discretionary refunds</h2><p>We do not offer refunds or prorated credits for a change of mind, unused subscription time, reduced usage, dissatisfaction with a particular AI response or cancellation partway through a billing period. This also applies to renewal payments, except where mandatory law or provider rules require otherwise. Review the price, renewal date and plan details before completing payment.</p></section>
+    <section><h2>2. Cancel future renewals</h2><p>Cancel before the next scheduled charge using the payment provider's subscription controls. A cancellation does not normally refund a completed payment. Your membership normally remains available until the end of the period already paid for, unless the provider revokes that period or another lawful restriction applies.</p><p>For Razorpay purchases, sign into the same Eva account and use <Link href="/subscription">Premium &gt; Cancel future renewals</Link>. For Google Play purchases, use <a href="https://play.google.com/store/account/subscriptions" target="_blank" rel="noopener noreferrer">Google Play subscriptions</a> in the Google account used for purchase. Removing the app or deleting your Eva account does not automatically cancel recurring billing.</p></section>
+    <section><h2>3. Google Play purchases</h2><p>Google Play purchases are also governed by Google's applicable billing and refund rules. Google may approve refunds independently of Eva's discretionary policy. Review <a href="https://support.google.com/googleplay/answer/2479637?hl=en" target="_blank" rel="noopener noreferrer">Google Play's refund policy</a> for eligibility and the request process. We cannot override Google's decisions or mandatory consumer protections.</p></section>
+    <section><h2>4. Payment problems and required remedies</h2><p>This policy does not exclude remedies for unauthorized or duplicate charges, non-delivery or deficient service where required by law, or any other non-waivable consumer rights. Report unauthorized charges promptly to your payment provider. If payment completed but Premium is missing, first sign into the purchasing Eva account and refresh payment status or restore the purchase.</p><p>Use the original provider's dispute or refund process where applicable. Include the transaction reference and payment date; never share your OTP, password or full card details. Reporting a problem does not guarantee a refund when no legal or provider entitlement applies.</p></section>
+    <section><h2>5. Approved refunds and access</h2><p>If a refund, reversal or chargeback is approved or required, its processing time and destination depend on the payment provider and your bank. We update membership access to reflect the verified payment status. A refunded or revoked paid period may no longer provide Premium access; a partial refund is handled according to the provider's verified subscription status.</p></section>
+    <section><h2>6. Related terms</h2><p>This policy forms part of our <Link href="/terms">Terms &amp; Conditions</Link>. If this policy conflicts with a mandatory legal right or applicable payment-provider requirement, that right or requirement takes precedence.</p></section>
+  </LegalPage>;
+}
