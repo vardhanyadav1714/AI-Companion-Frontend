@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 
 import type { ChatMessage } from "@/hooks/useChat";
+import { StoredMedia } from "./StoredMedia";
 
 export function ChatBubble({ message }: { message: ChatMessage }) {
   return (
@@ -13,6 +14,7 @@ export function ChatBubble({ message }: { message: ChatMessage }) {
       transition={{ duration: 0.25 }}
     >
       <div className="chat-bubble">{message.content}</div>
+      <StoredMedia media={message.media} />
     </motion.div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { apiRequest } from "@/lib/api-client";
-export type ChatMessage = { id: string; role: "user" | "assistant"; content: string };
+export type ChatMessage = { id: string; role: "user" | "assistant"; content: string; kind?: string; media?: { id: string; path: string; mimeType: string; size: number } };
 
 export function useChat(initialMessages: ChatMessage[], companionId = "eva") {
   const [messages, setMessages] = useState(initialMessages);
