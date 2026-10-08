@@ -13,6 +13,7 @@ export function useChat(initialMessages: ChatMessage[], companionId = "eva") {
   const [error, setError] = useState("");
   const [authRequired, setAuthRequired] = useState(false);
   const [paywall, setPaywall] = useState(false);
+  const [freeRemaining, setFreeRemaining] = useState<number | null>(null);
   const generation = useRef(0);
   const sending = useRef(false);
   const controller = useRef<AbortController | null>(null);
@@ -22,8 +23,12 @@ export function useChat(initialMessages: ChatMessage[], companionId = "eva") {
     sending.current = false; setMessages(initialMessages); setIsTyping(false); setLoading(true);
     setHistoryFailed(false);
     setConversationId(null); setPaywall(false); setError(""); setAuthRequired(false);
+    setFreeRemaining(null);
     void (async () => {
       try {
+        const quota = await apiRequest<{ usage: { freeRemaining: number | null } }>("/subscriptions/me", { signal: abort.signal });
+        if (generation.current !== current) return;
+        if (quota.success) setFreeRemaining(quota.data.usage.freeRemaining);
         const result = await apiRequest<Array<{ id: string; companionId: string }>>("/conversations", { signal: abort.signal });
         if (generation.current !== current) return;
         if (!result.success) { setAuthRequired(result.error.code === "AUTHENTICATION_REQUIRED"); throw new Error(result.error.message); }
@@ -41,6 +46,7 @@ export function useChat(initialMessages: ChatMessage[], companionId = "eva") {
 
   async function sendMessage(content: string): Promise<boolean> {
     if (sending.current || loading || historyFailed || paywall || authRequired || !content.trim()) return false;
+    if (freeRemaining === 0) { setPaywall(true); return false; }
     sending.current = true;
     const current = generation.current;
     setIsTyping(true); setError("");
@@ -53,13 +59,14 @@ export function useChat(initialMessages: ChatMessage[], companionId = "eva") {
         if (generation.current !== current) return false;
         setConversationId(id);
       }
-      const response = await apiRequest<{ userMessage: ChatMessage; assistantMessage: ChatMessage }>(`/conversations/${id}/messages`, { method: "POST", body: JSON.stringify({ content, companionId }), signal: controller.current?.signal });
+      const response = await apiRequest<{ userMessage: ChatMessage; assistantMessage: ChatMessage; usage: { freeRemaining: number | null } }>(`/conversations/${id}/messages`, { method: "POST", body: JSON.stringify({ content, companionId }), signal: controller.current?.signal });
       if (generation.current !== current) return false;
       if (!response.success) { setPaywall(response.error.code === "MESSAGE_LIMIT_REACHED"); setAuthRequired(response.error.code === "AUTHENTICATION_REQUIRED"); throw new Error(response.error.message); }
       setMessages(previous => [...previous, response.data.userMessage, response.data.assistantMessage]);
+      setFreeRemaining(response.data.usage.freeRemaining);
       return true;
     } catch (e) { if (generation.current === current) setError(e instanceof Error ? e.message : "Could not send message"); return false; }
     finally { if (generation.current === current) { sending.current = false; setIsTyping(false); } }
   }
-  return { messages, isTyping, loading, historyFailed, retryHistory: () => setAttempt(value => value + 1), error, authRequired, paywall, sendMessage };
+  return { messages, isTyping, loading, historyFailed, retryHistory: () => setAttempt(value => value + 1), error, authRequired, paywall, freeRemaining, sendMessage };
 }
