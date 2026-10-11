@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Check, UserRound } from "lucide-react";
+import { Check, UserRound, Trash2, LogOut } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { apiRequest } from "@/lib/api-client";
 
@@ -37,6 +37,9 @@ export default function ProfilePage() {
       <label>Occupation<input disabled={busy} maxLength={120} value={occupation} onChange={e => setOccupation(e.target.value)} /></label>
       <label>Birthday<input disabled={busy} type="date" autoComplete="bday" value={birthday} onChange={e => setBirthday(e.target.value)} /></label>
       <button className="e-button e-primary" disabled={busy || !name.trim() || values === original}><Check size={18} />{busy ? "Saving..." : "Save changes"}</button><Link className="e-text-button" href="/subscription">Manage subscription</Link>
+      <Link className="e-text-button" href="/privacy">Privacy policy</Link>
+      <a className="e-text-button" href="https://api.merigf.com/account/delete"><Trash2 size={18} />Delete account and data</a>
+      <button type="button" className="e-button" disabled={busy} onClick={async () => { setBusy(true); try { const result = await apiRequest("/auth/logout", { method: "POST", body: "{}" }); if (!result.success) throw new Error(result.error.message); window.location.assign("/login"); } catch (error) { setNotice(error instanceof Error ? error.message : "Could not sign out. Please try again."); setBusy(false); } }}><LogOut size={18} />Sign out</button>
     </form> : busy ? <p role="status">Loading your account...</p> : <Link className="e-button e-primary" href="/login">Sign in</Link>}
   </section></AppShell>;
 }

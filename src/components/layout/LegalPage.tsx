@@ -21,6 +21,8 @@ export function LegalPage({ title, summary, children }: { title: string; summary
       <nav className="e-legal-links" aria-label="Legal and account links">
         <Link href="/terms">Terms &amp; Conditions</Link>
         <Link href="/refund-policy">Cancellation &amp; Refund Policy</Link>
+        <Link href="/privacy">Privacy policy</Link>
+        <a href="https://api.merigf.com/account/delete">Delete account and data</a>
         <Link href="/login">Sign in</Link>
       </nav>
     </main>

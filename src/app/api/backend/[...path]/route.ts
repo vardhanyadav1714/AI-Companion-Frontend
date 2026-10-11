@@ -57,6 +57,12 @@ async function forward(request: NextRequest, context: { params: Promise<{ path: 
     return reply;
   }
   const payload = await response.json();
+  if (path.length === 2 && path[0] === "auth" && ["logout", "logout-all"].includes(path[1]) && response.ok) {
+    const reply = NextResponse.json(payload, { status: response.status });
+    reply.cookies.set("eva_access", "", { path: "/", maxAge: 0 });
+    reply.cookies.set("eva_refresh", "", { path: "/", maxAge: 0 });
+    return reply;
+  }
   const session = payload.success && payload.data?.accessToken ? payload.data : refreshed;
   if (session) {
     const { accessToken, refreshToken, ...publicData } = session;
