@@ -3597,6 +3597,13 @@ body {
   }
 }
 :root { --onboarding-width: 380px; }
+.e-place-search { display: grid; gap: 8px; min-width: 0; }
+.e-place-results { max-height: 200px; overflow-y: auto; }
+.e-place-results button { display: block; width: 100%; padding: 10px 12px; border: 0; border-bottom: 1px solid var(--border, #727272); background: transparent; color: inherit; text-align: left; overflow-wrap: anywhere; cursor: pointer; }
+.e-place-results button:hover, .e-place-results button[aria-selected="true"] { background: #ad2b501a; }
+.e-form label.e-place-billing { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.e-form .e-place-billing input { width: 16px; height: 16px; margin: 0; flex-shrink: 0; }
+.e-place-attribution { font-size: 11px; color: inherit; opacity: 0.7; }
 .eva-billing { width: min(100%, 420px); display: grid; gap: 20px; }
 .eva-billing h1 { font-size: 28px; }
 .eva-chat-payment { padding: 12px 18px; border-top: 1px solid #49414e; background: #17131b; }
