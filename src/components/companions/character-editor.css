@@ -1,0 +1,18 @@
+.e-character-editor { max-width: 760px; padding: 28px 24px 64px; margin: 0 auto; }
+.e-character-editor form { display: grid; gap: 24px; }
+.e-character-editor fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.e-character-editor legend { font-weight: 600; margin-bottom: 12px; }
+.e-character-editor label { display: grid; gap: 8px; font-size: 14px; font-weight: 500; min-width: 0; }
+.e-character-editor input:not([type=checkbox]), .e-character-editor textarea, .e-character-editor select { width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid var(--e-border, #77777755); border-radius: 8px; background: transparent; color: inherit; font: inherit; }
+.e-character-editor select option { color: #222; background: #fff; }
+.e-character-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.e-character-portraits { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.e-character-portraits button { position: relative; aspect-ratio: 1; min-width: 0; padding: 5px; border: 2px solid transparent; background: transparent; border-radius: 8px; color: #ec4899; }
+.e-character-portraits button[aria-pressed=true] { border-color: #ec4899; }
+.e-character-portraits button > div { width: 100%; height: 100%; border-radius: 6px; }
+.e-character-portraits button svg { position: absolute; bottom: 6px; right: 6px; background: #121212; border-radius: 4px; }
+.e-character-traits { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.e-character-traits label { display: flex; align-items: center; gap: 8px; }
+.e-character-traits input { accent-color: #ec4899; }
+.e-character-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; }
+@media (max-width: 480px) { .e-character-editor { padding: 20px 16px 40px; } .e-character-portraits { grid-template-columns: repeat(3, 1fr); } .e-character-traits { grid-template-columns: repeat(2, 1fr); } .e-character-fields { grid-template-columns: 1fr; } }
