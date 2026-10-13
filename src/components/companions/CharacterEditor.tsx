@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, Archive, Check, Save } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Portrait } from "./Portrait";
-import { companions } from "@/lib/companions";
+import { portraitOptions } from "@/lib/portrait-options";
 import { apiRequest } from "@/lib/api-client";
 import { characterTraits, type CustomCompanion } from "@/lib/custom-companions";
 import { useCustomCompanions } from "@/hooks/useCustomCompanions";
@@ -41,7 +41,7 @@ export function CharacterEditor({ id }: { id?: string }) {
     <Link href="/companions" className="e-text-button"><ArrowLeft size={17} /> Companions</Link>
     <header className="e-page-heading"><div><span className="e-eyebrow">PRIVATE TO YOU</span><h1>{savedId ? "Edit companion" : "Create companion"}</h1></div></header>
     {catalog.loading ? <p role="status">Loading...</p> : catalog.signedOut ? <Link href="/login" className="e-button">Sign in</Link> : catalog.error || unavailable ? <p role="alert">{catalog.error || "Companion not found."}</p> : <form onSubmit={event => { event.preventDefault(); void save(); }}>
-      <fieldset disabled={busy}><legend>Portrait</legend><div className="e-character-portraits">{companions.map(c => <button key={c.id} type="button" title={`Choose ${c.name} portrait`} aria-label={`Choose ${c.name} portrait`} aria-pressed={form.avatarId === c.id} onClick={() => { setForm({ ...form, avatarId: c.id }); setSaved(false); }}><Portrait companion={c} />{form.avatarId === c.id && <Check size={16} />}</button>)}</div></fieldset>
+      <fieldset disabled={busy}><legend>Portrait</legend><div className="e-character-portraits" role="group" aria-label="Portrait choices">{portraitOptions.map(c => <button key={c.id} type="button" title={`Choose ${c.name} portrait`} aria-label={`Choose ${c.name} portrait`} aria-pressed={form.avatarId === c.id} onClick={() => { setForm({ ...form, avatarId: c.id }); setSaved(false); }}><Portrait companion={c} />{form.avatarId === c.id && <Check size={16} />}</button>)}</div></fieldset>
       <fieldset disabled={busy} className="e-character-fields"><legend>Character</legend>
         <label>Name<input required maxLength={40} value={form.name} onChange={e => { setForm({ ...form, name: e.target.value }); setSaved(false); }} /></label>
         <label>Age<input required type="number" min={18} max={100} value={form.age} onChange={e => setForm({ ...form, age: Number(e.target.value) })} /></label>

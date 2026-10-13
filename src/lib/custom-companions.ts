@@ -1,4 +1,5 @@
 import { companions, type Companion } from "./companions";
+import { portraitOptions } from "./portrait-options";
 
 export const characterTraits = ["Caring", "Playful", "Calm", "Witty", "Creative", "Confident", "Curious", "Supportive"];
 export type CustomCompanion = {
@@ -6,7 +7,7 @@ export type CustomCompanion = {
   backstory: string; language: string; conversationStyle: string; archived: boolean;
 };
 export function asCompanion(character: CustomCompanion): Companion {
-  const avatar = companions.find(c => c.id === character.avatarId) ?? companions[0];
+  const avatar = portraitOptions.find(c => c.id === character.avatarId) ?? companions[0];
   return { ...avatar, id: character.id, name: character.name, description: character.backstory || "Your private companion.",
     personality: character.traits.join(", "), conversationStyle: character.conversationStyle,
     greeting: `Hi, I'm ${character.name}. How is your day going?`, language: character.language,
