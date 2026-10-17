@@ -6,7 +6,8 @@ import { Check, CreditCard, RefreshCw, Crown, ExternalLink, CircleX } from "luci
 import { AppShell } from "@/components/layout/AppShell";
 import { apiRequest } from "@/lib/api-client";
 
-type Plan = { amount: number; currency: string; interval: string; planId: string };
+type Plan = { amount: number; currency: string; interval: string; planId: string;
+  fairUse?: { dailyMessages: number; voiceNoteMaxSeconds: number; dailyVoiceInputSeconds: number; dailySpeechCharacters: number } };
 type Status = { active: boolean; status: string; provider?: string; autoRenew?: boolean; cancelAtPeriodEnd?: boolean; currentEnd?: string; usage: { premium: boolean; freeRemaining: number | null; freeLimit?: number } };
 export default function SubscriptionPage() {
   const [status, setStatus] = useState<Status | null>(null);
@@ -76,6 +77,8 @@ export default function SubscriptionPage() {
     <div className="e-billing-layout"><section className="e-plan"><Crown size={27} /><h2>Monthly membership</h2><div className="e-price">INR 499<span> / month</span></div>
       <ul><li><Check size={18} />Monthly Premium membership</li><li><Check size={18} />Talk with every companion</li><li><Check size={18} />Keep your conversations in one account</li></ul>
       <p className="e-fine">Auto-renews monthly until cancelled. Manage future renewals through your payment provider.</p>
+      <p className="e-fine">Free accounts include 10 messages and one voice note in total, shared across companions.</p>
+      {plan?.fairUse && <p className="e-fine">Daily fair use: {plan.fairUse.dailyMessages} messages across all companions, {plan.fairUse.dailyVoiceInputSeconds / 60} minutes of voice input, and {plan.fairUse.dailySpeechCharacters.toLocaleString()} spoken-reply characters. Voice notes can be up to {plan.fairUse.voiceNoteMaxSeconds} seconds. After the spoken-reply allowance, replies continue as text. Daily allowances reset at midnight UTC (5:30 AM IST).</p>}
       <p className="e-fine e-legal-consent">By purchasing, you agree to our <Link href="/terms">Terms</Link>. No discretionary refunds for unused time or change of mind; legal and provider exceptions apply. Read the <Link href="/refund-policy">Cancellation &amp; Refund Policy</Link>.</p>
       {status?.active ? <Link className="e-button e-primary" href="/chat">Continue chatting</Link> : authRequired ? <Link className="e-button e-primary" href="/login">Sign in to continue</Link> : <button className="e-button e-primary" disabled={busy || !ready || !status || !!error} onClick={checkout}><CreditCard size={18} />{busy ? "Checking..." : "Continue with Razorpay"}</button>}
       {!busy && !ready && !status?.active && <p className="e-fine">The INR 499 checkout is not available yet. No payment has been taken.</p>}

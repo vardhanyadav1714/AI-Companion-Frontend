@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import stories from "./companion-stories.json";
 
 export type CompanionTheme = {
   background: string;
@@ -228,7 +229,11 @@ const catalog: Companion[] = [
   }
 ];
 
-export const companions = catalog.slice(0, 6);
+export const companions = catalog.slice(0, 6).map(companion => {
+  const story = stories[companion.id as keyof typeof stories];
+  return { ...companion, description: story.description, personality: story.personality,
+    conversationStyle: story.conversationStyle, traits: story.traits, tags: story.traits, interests: story.interests };
+});
 
 export function getCompanionById(id: string | null | undefined): Companion {
   return companions.find((companion) => companion.id === id) ?? companions[0];

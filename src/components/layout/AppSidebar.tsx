@@ -93,7 +93,7 @@ export function AppSidebar({ active }: AppSidebarProps) {
         <strong>Eva Premium</strong>
           <Crown size={20} />
         </div>
-        <p>Unlimited chats, advanced memory, voice calls and exclusive companions.</p>
+        <p>More chats, shared memory and voice notes. Daily fair-use allowances apply.</p>
         <Link href="/subscription">View plan</Link>
       </div>
 
