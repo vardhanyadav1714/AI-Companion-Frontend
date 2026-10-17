@@ -13,8 +13,8 @@ export default async function CompanionProfile({ params }: { params: Promise<{ i
     <Link href="/companions" className="e-back-link"><ArrowLeft size={18} />All companions</Link>
     <div className="e-profile-grid">
       <CompanionGallery key={c.id} name={c.name} photos={story.photos} />
-      <section><span className="e-eyebrow">FICTIONAL AI COMPANION</span><h1>{c.name}</h1>
-        <p className="e-fine">{story.age} | {story.city} | Character backstory</p>
+      <section><span className="e-eyebrow">AI COMPANION</span><h1>{c.name}</h1>
+        <p className="e-fine">{story.age} | {story.city}</p>
         <p className="e-profile-description">{c.description}</p><div className="e-tags">{c.traits.map(t => <span key={t}>{t}</span>)}</div>
         <h2 className="e-story-title">{story.title}</h2><p className="e-character-story">{story.backstory}</p>
         <Link className="e-button e-primary" href={`/chat?companion=${c.id}`}><MessageCircle size={18} />Chat with {c.name}<ArrowUpRight size={18} /></Link>
