@@ -16,6 +16,7 @@ export function useChat(initialMessages: ChatMessage[], companionId = "eva") {
   const [freeRemaining, setFreeRemaining] = useState<number | null>(null);
   const generation = useRef(0);
   const sending = useRef(false);
+  const pendingMessage = useRef<{ conversationId: string; content: string; requestId: string } | null>(null);
   const controller = useRef<AbortController | null>(null);
   useEffect(() => {
     const current = ++generation.current;
@@ -59,10 +60,18 @@ export function useChat(initialMessages: ChatMessage[], companionId = "eva") {
         if (generation.current !== current) return false;
         setConversationId(id);
       }
-      const response = await apiRequest<{ userMessage: ChatMessage; assistantMessage: ChatMessage; usage: { freeRemaining: number | null } }>(`/conversations/${id}/messages`, { method: "POST", body: JSON.stringify({ content, companionId }), signal: controller.current?.signal });
+      // A manual retry after a lost response must reuse the original server claim.
+      if (pendingMessage.current?.conversationId !== id || pendingMessage.current.content !== content) {
+        pendingMessage.current = { conversationId: id, content, requestId: crypto.randomUUID() };
+      }
+      const response = await apiRequest<{ userMessage: ChatMessage; assistantMessage: ChatMessage; usage: { freeRemaining: number | null } }>(`/conversations/${id}/messages`, { method: "POST", body: JSON.stringify({ content, companionId, requestId: pendingMessage.current.requestId }), signal: controller.current?.signal });
       if (generation.current !== current) return false;
       if (!response.success) { setPaywall(response.error.code === "MESSAGE_LIMIT_REACHED"); setAuthRequired(response.error.code === "AUTHENTICATION_REQUIRED"); throw new Error(response.error.message); }
-      setMessages(previous => [...previous, response.data.userMessage, response.data.assistantMessage]);
+      pendingMessage.current = null;
+      setMessages(previous => {
+        const knownIds = new Set(previous.map(message => message.id));
+        return [...previous, ...[response.data.userMessage, response.data.assistantMessage].filter(message => !knownIds.has(message.id))];
+      });
       setFreeRemaining(response.data.usage.freeRemaining);
       return true;
     } catch (e) { if (generation.current === current) setError(e instanceof Error ? e.message : "Could not send message"); return false; }
