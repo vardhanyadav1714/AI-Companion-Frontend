@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAllowedRequestOrigin } from "@/lib/request-origin";
+import { clientIpHeaders } from "@/lib/client-ip";
 
 async function forward(request: NextRequest, context: { params: Promise<{ path: string[] }> }) {
   const { path } = await context.params;
@@ -13,10 +14,11 @@ async function forward(request: NextRequest, context: { params: Promise<{ path: 
     return NextResponse.json({ success: false, error: { code: "FORBIDDEN", message: "Invalid request origin" } }, { status: 403 });
   }
   let token = request.cookies.get("eva_access")?.value;
+  const peerHeaders = clientIpHeaders(request.headers, process.env.WEB_PROXY_KEY || "");
   let refreshed: { accessToken: string; refreshToken?: string } | undefined;
   if (!token && request.cookies.get("eva_refresh")?.value) {
     const refresh = await fetch(`${base.replace(/\/$/, "")}/auth/refresh`, {
-      method: "POST", headers: { "Content-Type": "application/json" },
+      method: "POST", headers: { "Content-Type": "application/json", ...peerHeaders }, redirect: "error",
       body: JSON.stringify({ refreshToken: request.cookies.get("eva_refresh")!.value }),
       cache: "no-store", signal: AbortSignal.timeout(10000)
     });
@@ -26,13 +28,14 @@ async function forward(request: NextRequest, context: { params: Promise<{ path: 
   const body = request.method === "GET" ? undefined : await request.text();
   const options: RequestInit = {
     method: request.method, body,
-    headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    headers: { "Content-Type": "application/json", ...peerHeaders, ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    redirect: "error",
     cache: "no-store", signal: AbortSignal.timeout(60000)
   };
   let response = await fetch(target, options);
   if (response.status === 401 && !refreshed && request.cookies.get("eva_refresh")?.value) {
     const refresh = await fetch(`${base.replace(/\/$/, "")}/auth/refresh`, {
-      method: "POST", headers: { "Content-Type": "application/json" },
+      method: "POST", headers: { "Content-Type": "application/json", ...peerHeaders }, redirect: "error",
       body: JSON.stringify({ refreshToken: request.cookies.get("eva_refresh")!.value }),
       cache: "no-store", signal: AbortSignal.timeout(10000)
     });
@@ -41,7 +44,7 @@ async function forward(request: NextRequest, context: { params: Promise<{ path: 
       refreshed = result.data;
       token = refreshed?.accessToken;
       await response.body?.cancel();
-      response = await fetch(target, { ...options, headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(60000) });
+      response = await fetch(target, { ...options, headers: { "Content-Type": "application/json", ...peerHeaders, Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(60000) });
     }
   }
   if (request.method === "GET" && path.length === 2 && path[0] === "media" && response.ok) {
